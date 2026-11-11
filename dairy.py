@@ -27,7 +27,7 @@ def init_db():
                    CREATE TABLE IF NOT EXISTS groups(
                    id INTEGER PRIMARY KEY,
                    name TEXT NOT NULL,
-                   course INTEGER NOT NULL (course IN (1,2,3,4,5)))
+                   course INTEGER NOT NULL (mark BETWEEN 1 AND 5))
                    ''')
 
     cursor.execute('''
@@ -38,4 +38,26 @@ def init_db():
                    fio TEXT NOT NULL,
                    group_id INTEGER NOT NULL REFERENSES groups(id))
                    ''')
+
+    cursor.execute('''
+                   CREATE TABLE IF NOT EXISTS marks(
+                   id INTEGER PRIMARY KEY,
+                   student_id INTEGER NOT NULL REFERENSES students(id) ON DELETE CASCADE,
+                   lesson_id INTEGER NOT NULL REFERENSES lessons(id),
+                   mark INTEGER NOT NULL CHECK(mark BETWEEN 2 AND 5),
+                   date DATE NOT NULL,
+                   semester INTEGER NOT NULL)
+                   ''')
+
+    cursor.execute('''
+                   CREATE TABLE IF NOT EXISTS attendance(
+                   id INTEGER PRIMARY KEY,
+                   student_id INTEGER NOT NULL REFERENSES students(id) ON DELETE CASCADE,
+                   lesson_id INTEGER NOT NULL REFERENSES lessons(id),
+                   date DATE NOT NULL,
+                   status TEXT NOT NULL (status IN ('P', 'N', 'NB', 'NU')))
+                   ''')
+
+    con.commit()
+    con.close()
     
