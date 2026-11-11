@@ -20,30 +20,35 @@ def init_db():
                    login TEXT NOT NULL UNIQUE,
                    pass TEXT NOT NULL,
                    fio TEXT NOT NULL,
-                   role CHAR NOT NULL (role IN ('s', 't', 'o')))
+                   role CHAR NOT NULL CHECK (role IN ('s', 't', 'o')))
                    ''')
 
     cursor.execute('''
                    CREATE TABLE IF NOT EXISTS groups(
                    id INTEGER PRIMARY KEY,
-                   name TEXT NOT NULL,
-                   course INTEGER NOT NULL (mark BETWEEN 1 AND 5))
+                   name TEXT NOT NULL UNIQUE,
+                   course INTEGER NOT NULL CHECK (course BETWEEN 1 AND 5))
+                   ''')
+
+    cursor.execute('''
+                   CREATE TABLE IF NOT EXISTS lessons(
+                   id INTEGER PRIMARY KEY,
+                   name TEXT NOT NULL)
                    ''')
 
     cursor.execute('''
                    CREATE TABLE IF NOT EXISTS students(
                    id INTEGER PRIMARY KEY,
-                   user_id INTEGER NOT NULL REFERENSES users(id),
-                   pass TEXT NOT NULL,
+                   user_id INTEGER NOT NULL REFERENCES users(id),
                    fio TEXT NOT NULL,
-                   group_id INTEGER NOT NULL REFERENSES groups(id))
+                   group_id INTEGER NOT NULL REFERENCES groups(id))
                    ''')
 
     cursor.execute('''
                    CREATE TABLE IF NOT EXISTS marks(
                    id INTEGER PRIMARY KEY,
-                   student_id INTEGER NOT NULL REFERENSES students(id) ON DELETE CASCADE,
-                   lesson_id INTEGER NOT NULL REFERENSES lessons(id),
+                   student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+                   lesson_id INTEGER NOT NULL REFERENCES lessons(id),
                    mark INTEGER NOT NULL CHECK(mark BETWEEN 2 AND 5),
                    date DATE NOT NULL,
                    semester INTEGER NOT NULL)
@@ -52,10 +57,10 @@ def init_db():
     cursor.execute('''
                    CREATE TABLE IF NOT EXISTS attendance(
                    id INTEGER PRIMARY KEY,
-                   student_id INTEGER NOT NULL REFERENSES students(id) ON DELETE CASCADE,
-                   lesson_id INTEGER NOT NULL REFERENSES lessons(id),
+                   student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+                   lesson_id INTEGER NOT NULL REFERENCES lessons(id),
                    date DATE NOT NULL,
-                   status TEXT NOT NULL (status IN ('P', 'N', 'NB', 'NU')))
+                   status TEXT NOT NULL CHECK (status IN ('P', 'N', 'NB', 'NU')))
                    ''')
 
     con.commit()
